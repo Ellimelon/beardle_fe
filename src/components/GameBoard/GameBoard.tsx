@@ -1,6 +1,6 @@
-import WordRow from './WordRow'
+import WordRow from '../WordRow/WordRow'
 import styles from './GameBoard.module.css'
-import type { WordRowCharacters } from './WordRow'
+import type { WordRowCharacters } from '../WordRow/WordRow'
 
 type GameBoardProps = {
   character_rows: WordRowCharacters[]

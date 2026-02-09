@@ -1,6 +1,6 @@
-import CharacterCell from "./CharacterCell"
+import CharacterCell from "../CharacterCell/CharacterCell"
 import styles from './WordRow.module.css'
-import type { CharacterCellProps } from "./CharacterCell"
+import type { CharacterCellProps } from "../CharacterCell/CharacterCell"
 
 export type WordRowCharacters = CharacterCellProps[]
 

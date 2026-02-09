@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import styles from './App.module.css'
-import GameBoard from './GameBoard'
-import { VALID_ALPHANUMERIC_CHARACTERS, type AlphanumericCharacter } from './CharacterCell'
-import type { WordRowCharacters } from './WordRow'
+import GameBoard from './components/GameBoard'
+import { VALID_ALPHANUMERIC_CHARACTERS, type AlphanumericCharacter } from './components/CharacterCell/CharacterCell'
+import type { WordRowCharacters } from './components/WordRow/WordRow'
 
 const MAX_INPUT_LENGTH = 5
 const MAX_ATTEMPTS = 6
