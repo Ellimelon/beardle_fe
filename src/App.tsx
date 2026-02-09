@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
-import styles from './App.module.css'
+
 import GameBoard from './components/GameBoard'
-import { VALID_ALPHANUMERIC_CHARACTERS, type AlphanumericCharacter } from './components/CharacterCell/CharacterCell'
-import type { WordRowCharacters } from './components/WordRow/WordRow'
+import { CHARACTERS } from './components/CharacterCell/constants'
+import { STATUS } from './components/CharacterCell/constants'
+import type { Character } from './components/CharacterCell/types'
+import type { CharacterCellProps } from './components/CharacterCell'
+import styles from './App.module.css'
 
 const MAX_INPUT_LENGTH = 5
 const MAX_ATTEMPTS = 6
@@ -15,9 +18,9 @@ const GAME_STATUS = {
 type GameStatus = typeof GAME_STATUS[keyof typeof GAME_STATUS]
 
 function App() {
-  const [input, setInput] = useState<WordRowCharacters[]>(
+  const [input, setInput] = useState<CharacterCellProps[][]>(
     Array.from({ length: MAX_ATTEMPTS }, () =>
-      Array.from({ length: MAX_INPUT_LENGTH }, () => ({ character: null, status: 'absent' }))
+      Array.from({ length: MAX_INPUT_LENGTH }, () => ({ character: null, status: STATUS.ABSENT }))
     )
   )
   const [pointer_y_index, setPointerYIndex] = useState<number>(0)
@@ -34,10 +37,10 @@ function App() {
       return
     }
     if (
-      VALID_ALPHANUMERIC_CHARACTERS.includes(e.key.toUpperCase() as any)
+      CHARACTERS.includes(e.key.toUpperCase() as any)
       && input[pointer_y_index][pointer_x_index].character === null
     ) {
-      var character = e.key.toUpperCase() as AlphanumericCharacter
+      var character = e.key.toUpperCase() as Character
       setInput(
         (prev) => {
           const next = prev.map((row) => [...row])
@@ -81,14 +84,14 @@ function App() {
           const character = next_input[pointer_y_index][x].character
 
           if (character === WORD[x]) {
-            next_input[pointer_y_index][x].status = 'correct'
+            next_input[pointer_y_index][x].status = STATUS.CORRECT
             available_letters.splice(available_letters.indexOf(character!), 1)
           }
         }
         for (let x = 0; x < next_input[pointer_y_index].length; x++) {
           const character = next_input[pointer_y_index][x].character
           if (available_letters.includes(character!)) {
-            next_input[pointer_y_index][x].status = 'present'
+            next_input[pointer_y_index][x].status = STATUS.PRESENT
             available_letters.splice(available_letters.indexOf(character!), 1)
           }
         }
@@ -112,7 +115,7 @@ function App() {
   return (
     <div ref={divRef} className={styles.app} onKeyDown={handleKeyDown} tabIndex={0}>
       <h1>Bear-dle</h1>
-      <GameBoard character_rows={input} />
+      <GameBoard wordRows={input.map(row => ({characterCells: row}))} />
     </div>
   )
 }

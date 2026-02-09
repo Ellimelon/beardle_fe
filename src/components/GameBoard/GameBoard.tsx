@@ -1,16 +1,12 @@
 import WordRow from '../WordRow/WordRow'
+import type { Props } from './types'
 import styles from './GameBoard.module.css'
-import type { WordRowCharacters } from '../WordRow/WordRow'
 
-type GameBoardProps = {
-  character_rows: WordRowCharacters[]
-}
-
-function GameBoard({ character_rows }: GameBoardProps) {
+function GameBoard({ wordRows }: Props) {
   return (
     <div className={styles.gameBoard}>
-      {character_rows.map((characters, rowIdx) => (
-        <WordRow key={rowIdx} character_cell_props={characters} />
+      {wordRows.map((wordRow, rowIdx) => (
+        <WordRow key={rowIdx} characterCells={wordRow.characterCells} />
       ))}
     </div>
   )

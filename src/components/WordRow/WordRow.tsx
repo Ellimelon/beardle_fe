@@ -1,18 +1,12 @@
-import CharacterCell from "../CharacterCell/CharacterCell"
+import CharacterCell from "../CharacterCell"
+import type { Props } from "./types"
 import styles from './WordRow.module.css'
-import type { CharacterCellProps } from "../CharacterCell/CharacterCell"
 
-export type WordRowCharacters = CharacterCellProps[]
-
-type WordRowProps = {
-  character_cell_props: WordRowCharacters
-}
-
-function WordRow({ character_cell_props }: WordRowProps) {
+function WordRow({ characterCells }: Props) {
   return (
     <div className={styles.wordRow}>
-      {character_cell_props.map((character_cell_prop, rowIdx) => (
-        <CharacterCell key={rowIdx} character={character_cell_prop.character} status={character_cell_prop.status} />
+      {characterCells.map((characterCell, rowIdx) => (
+        <CharacterCell key={rowIdx} character={characterCell.character} status={characterCell.status} />
       ))}
     </div>
   )
