@@ -1,121 +1,49 @@
 import { useState, useEffect, useRef } from 'react'
 
 import GameBoard from './components/GameBoard'
-import { CHARACTERS } from './components/CharacterCell/constants'
 import { STATUS } from './components/CharacterCell/constants'
-import type { Character } from './components/CharacterCell/types'
 import type { CharacterCellProps } from './components/CharacterCell'
+import { STATUS as GAME_STATUS } from './components/GameBoard/constants'
+import type { Status as GameStatus } from './components/GameBoard/types'
 import styles from './App.module.css'
 
 const MAX_INPUT_LENGTH = 5
 const MAX_ATTEMPTS = 6
 const WORD = 'SHARK' as const
-const GAME_STATUS = {
-  IN_PROGRESS: 'in_progress',
-  WON: 'won',
-  LOST: 'lost'
-} as const
-type GameStatus = typeof GAME_STATUS[keyof typeof GAME_STATUS]
 
 function App() {
-  const [input, setInput] = useState<CharacterCellProps[][]>(
+  const gameBoardRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    gameBoardRef.current?.focus()
+  }, [])
+
+  
+  const [pointer_y_index, setPointerYIndex] = useState<number>(0)
+  const [pointer_x_index, setPointerXIndex] = useState<number>(0)
+  const [character_cells_props, setCharacterCellProps] = useState<CharacterCellProps[][]>(
     Array.from({ length: MAX_ATTEMPTS }, () =>
       Array.from({ length: MAX_INPUT_LENGTH }, () => ({ character: null, status: STATUS.ABSENT }))
     )
   )
-  const [pointer_y_index, setPointerYIndex] = useState<number>(0)
-  const [pointer_x_index, setPointerXIndex] = useState<number>(0)
   const [game_status, setGameStatus] = useState<GameStatus>(GAME_STATUS.IN_PROGRESS)
-  const divRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    divRef.current?.focus()
-  }, [])
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (game_status !== GAME_STATUS.IN_PROGRESS) {
-      return
-    }
-    if (
-      CHARACTERS.includes(e.key.toUpperCase() as any)
-      && input[pointer_y_index][pointer_x_index].character === null
-    ) {
-      var character = e.key.toUpperCase() as Character
-      setInput(
-        (prev) => {
-          const next = prev.map((row) => [...row])
-          next[pointer_y_index][pointer_x_index].character = character
-
-          return next
-        }
+  const onClick = () => {
+    setCharacterCellProps(
+      Array.from({ length: MAX_ATTEMPTS }, () =>
+        Array.from({ length: MAX_INPUT_LENGTH }, () => ({ character: null, status: STATUS.ABSENT }))
       )
-      setPointerXIndex((prev) => Math.min(prev + 1, MAX_INPUT_LENGTH -1))
-    }
-    else if (
-      (e.key === 'Backspace' || e.key === 'Delete')
-      && pointer_x_index > 0
-    ) {
-      const target_x_index: number =
-        input[pointer_y_index][pointer_x_index].character !== null
-          ? pointer_x_index
-          : pointer_x_index - 1
-
-      setInput((prev) => {
-        const next_input = prev.map((row) => [...row])
-        next_input[pointer_y_index][target_x_index].character = null
-
-        return next_input
-      })
-      
-      if (target_x_index < pointer_x_index) {
-        setPointerXIndex(target_x_index)
-      }
-    }
-    else if (
-      e.key === 'Enter'
-      && input[pointer_y_index].every(
-        (character_cell_prop) => character_cell_prop.character !== null
-      )
-    ) {
-      setInput((prev) => {
-        const next_input = prev.map((row) => [...row])
-        const available_letters: string[] = WORD.split('')
-        for (let x = 0; x < next_input[pointer_y_index].length; x++) {
-          const character = next_input[pointer_y_index][x].character
-
-          if (character === WORD[x]) {
-            next_input[pointer_y_index][x].status = STATUS.CORRECT
-            available_letters.splice(available_letters.indexOf(character!), 1)
-          }
-        }
-        for (let x = 0; x < next_input[pointer_y_index].length; x++) {
-          const character = next_input[pointer_y_index][x].character
-          if (available_letters.includes(character!)) {
-            next_input[pointer_y_index][x].status = STATUS.PRESENT
-            available_letters.splice(available_letters.indexOf(character!), 1)
-          }
-        }
-
-        return next_input
-      })
-
-      if (input[pointer_y_index].every((cell, x) => cell.character === WORD[x])) {
-        setGameStatus(GAME_STATUS.WON)
-      }
-      else if (pointer_y_index + 1 >= MAX_ATTEMPTS) {
-        setGameStatus(GAME_STATUS.LOST)
-      }
-      else{
-        setPointerYIndex((prev) => Math.min(prev + 1, MAX_ATTEMPTS - 1) )
-        setPointerXIndex(0)
-      }
-    }
+    )
+    setPointerYIndex(0)
+    setPointerXIndex(0)
+    setGameStatus(GAME_STATUS.IN_PROGRESS)
   }
 
   return (
-    <div ref={divRef} className={styles.app} onKeyDown={handleKeyDown} tabIndex={0}>
+    <div className={styles.app} tabIndex={0}>
       <h1>Bear-dle</h1>
-      <GameBoard wordRows={input.map(row => ({characterCells: row}))} />
+      <GameBoard ref={gameBoardRef} state={{pointerYIndex: pointer_y_index, pointerXIndex: pointer_x_index, characterCellsProps: character_cells_props, status: game_status}} stateSetters={{setPointerYIndex: setPointerYIndex, setPointerXIndex: setPointerXIndex, setCharacterCellProps: setCharacterCellProps, setStatus: setGameStatus}} word={WORD}/>
+      <div onClick={onClick}>RESET</div>
     </div>
   )
 }

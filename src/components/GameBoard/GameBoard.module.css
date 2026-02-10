@@ -3,3 +3,7 @@
   flex-direction: column;
   gap: 0.5rem;
 }
+.gameBoard:focus {
+  outline: none;
+  box-shadow: none;
+}
